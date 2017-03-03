@@ -9,6 +9,9 @@ def __touchit(label)
   puts "SimpleCov::Formatter::Codecov touch", output, "\n\n\n"
 end
 
+puts "SimpleCov::Formatter::Codecov __touchit defined"
+__touchit("TOUCHIT-WORKS")
+
 class SimpleCov::Formatter::Codecov
   VERSION = "0.1.10"
   def format(result)
