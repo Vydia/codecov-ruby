@@ -2,6 +2,8 @@ require 'uri'
 require 'json'
 require 'net/http'
 
+puts "SimpleCov::Formatter::Codecov LOADED"
+
 class SimpleCov::Formatter::Codecov
   VERSION = "0.1.10"
   def format(result)
@@ -19,6 +21,8 @@ class SimpleCov::Formatter::Codecov
 
     json = report.to_json
 
+    puts "SimpleCov::Formatter::Codecov REPORT", json
+
     # ==============
     # CI Environment
     # ==============
@@ -27,6 +31,8 @@ class SimpleCov::Formatter::Codecov
       "token" => ENV['CODECOV_TOKEN'],
       "flags" => ENV['CODECOV_FLAG'] || ENV['CODECOV_FLAGS']
     }
+
+    puts "SimpleCov::Formatter::Codecov ENV", ENV.to_h
 
     # Travis CI
     # ---------
@@ -231,6 +237,8 @@ class SimpleCov::Formatter::Codecov
     https = Net::HTTP.new(uri.host, uri.port)
     https.use_ssl = url.match(/^https/) != nil
 
+    puts "SimpleCov::Formatter::Codecov URL", uri.to_s
+
     begin
       req = Net::HTTP::Post.new(uri.path + "?" + uri.query,
                                 {
@@ -243,8 +251,12 @@ class SimpleCov::Formatter::Codecov
       # make resquest
       response = https.request(req)
 
+      puts "SimpleCov::Formatter::Codecov BEFORE PUTS RESPONSE BODY"
+
       # print to output
       puts response.body
+
+      puts "SimpleCov::Formatter::Codecov PUTS RESPONSE BODY", response.body.inspect
 
       # join the response to report
       report['result'] = JSON.parse(response.body)
@@ -257,6 +269,8 @@ class SimpleCov::Formatter::Codecov
       report
 
     rescue StandardError => err
+      puts "SimpleCov::Formatter::Codecov ERROR", err.inspect
+
       puts 'Error uploading coverage reports to Codecov. Sorry'
       puts err
     end
