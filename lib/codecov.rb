@@ -4,10 +4,16 @@ require 'net/http'
 
 puts "SimpleCov::Formatter::Codecov LOADED"
 
+def __touchit(label)
+  output = system("touch /tmp/#{label}")
+  puts "SimpleCov::Formatter::Codecov touch", output, "\n\n\n"
+end
+
 class SimpleCov::Formatter::Codecov
   VERSION = "0.1.10"
   def format(result)
     puts "SimpleCov::Formatter::Codecov FORMAT CALLED"
+    __touchit("FORMAT-CALLED")
 
     net_blockers(:off)
 
@@ -24,6 +30,7 @@ class SimpleCov::Formatter::Codecov
     json = report.to_json
 
     puts "SimpleCov::Formatter::Codecov REPORT", json
+    __touchit("REPORT")
 
     # ==============
     # CI Environment
@@ -35,6 +42,7 @@ class SimpleCov::Formatter::Codecov
     }
 
     puts "SimpleCov::Formatter::Codecov ENV", ENV.to_h
+    __touchit("ENV")
 
     # Travis CI
     # ---------
@@ -240,6 +248,7 @@ class SimpleCov::Formatter::Codecov
     https.use_ssl = url.match(/^https/) != nil
 
     puts "SimpleCov::Formatter::Codecov URL", uri.to_s
+    __touchit("URL")
 
     begin
       req = Net::HTTP::Post.new(uri.path + "?" + uri.query,
@@ -254,11 +263,13 @@ class SimpleCov::Formatter::Codecov
       response = https.request(req)
 
       puts "SimpleCov::Formatter::Codecov BEFORE PUTS RESPONSE BODY"
+      __touchit("BEFORE-PUTS-RESPONSE-BODY")
 
       # print to output
       puts response.body
 
       puts "SimpleCov::Formatter::Codecov PUTS RESPONSE BODY", response.body.inspect
+      __touchit("PUTS-RESPONSE-BODY")
 
       # join the response to report
       report['result'] = JSON.parse(response.body)
@@ -272,6 +283,7 @@ class SimpleCov::Formatter::Codecov
 
     rescue StandardError => err
       puts "SimpleCov::Formatter::Codecov ERROR", err.inspect
+      __touchit("ERROR")
 
       puts 'Error uploading coverage reports to Codecov. Sorry'
       puts err
