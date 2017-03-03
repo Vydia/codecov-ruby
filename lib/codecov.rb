@@ -7,6 +7,8 @@ puts "SimpleCov::Formatter::Codecov LOADED"
 class SimpleCov::Formatter::Codecov
   VERSION = "0.1.10"
   def format(result)
+    puts "SimpleCov::Formatter::Codecov FORMAT CALLED"
+
     net_blockers(:off)
 
     # =================
