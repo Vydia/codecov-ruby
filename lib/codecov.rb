@@ -277,7 +277,10 @@ class SimpleCov::Formatter::Codecov
   end
 
   def retry_request(req, https)
-    retries = 3
+    max_retries = 5
+    retries = 5
+    backoff_base = 1.5
+
     begin
       response = https.request(req)
     rescue Timeout::Error, SocketError => e
@@ -291,6 +294,9 @@ class SimpleCov::Formatter::Codecov
 
       puts 'Timeout or connection error uploading coverage reports to Codecov. Retrying...'
       puts e
+      sleep_seconds = backoff_base ** (max_retries - retries)
+      puts "Sleeping for #{sleep_seconds} seconds before retrying..."
+      sleep sleep_seconds
       retry
     rescue StandardError => e
       puts 'Error uploading coverage reports to Codecov. Sorry'
